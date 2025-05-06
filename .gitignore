@@ -1,3 +1,5 @@
+.direnv/
+
 b*.orig
 *.pyc
 *.swp
