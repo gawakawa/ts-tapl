@@ -1,17 +1,17 @@
 import { parseArith } from 'tiny-ts-parser';
 
-type Type =
+export type Type =
   | { tag: 'Boolean' }
   | { tag: 'Number' };
 
-type Term =
+export type Term =
   | { tag: 'true' }
   | { tag: 'false' }
   | { tag: 'if'; cond: Term; thn: Term; els: Term }
   | { tag: 'number'; n: number }
   | { tag: 'add'; left: Term; right: Term };
 
-const typecheck = (t: Term): Type => {
+export const typecheck = (t: Term): Type => {
   switch (t.tag) {
     case 'true':
       return { tag: 'Boolean' };
