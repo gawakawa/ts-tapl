@@ -19,8 +19,11 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Execute format
+      - name: Execute formatter
         run: deno fmt --check
 
-      - name: Execute lint
+      - name: Execute linter
         run: deno lint
+
+      - name: Execute test
+        run: deno task test
