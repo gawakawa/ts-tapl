@@ -3,7 +3,7 @@ import {
   assertThrows,
 } from 'https://deno.land/std/assert/mod.ts';
 
-import { Term, typecheck } from './arith.ts';
+import { Term, typecheck } from '../src/arith.ts';
 
 Deno.test('typecheck boolean literals', () => {
   // true
