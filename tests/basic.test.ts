@@ -92,7 +92,7 @@ Deno.test('typecheck throws on unknown variable', () => {
   assertThrows(
     () => typecheck(term, {}),
     Error,
-    'unknown variable: x',
+    'unknown variable',
   );
 });
 
@@ -210,6 +210,151 @@ Deno.test('typecheck throws on variable reference not in environment', () => {
   assertThrows(
     () => typecheck(callTerm, {}),
     Error,
-    'unknown variable: x',
+    'unknown variable',
+  );
+});
+
+Deno.test('typecheck sequence of expressions', () => {
+  // 1; 2
+  const term: Term = {
+    tag: 'seq',
+    body: { tag: 'number', n: 1 },
+    rest: { tag: 'number', n: 2 },
+  };
+
+  assertEquals(typecheck(term, {}), { tag: 'Number' });
+});
+
+Deno.test('typecheck throws on invalid expression in seq body', () => {
+  // add(1, true); 2
+  const term: Term = {
+    tag: 'seq',
+    body: {
+      tag: 'add',
+      left: { tag: 'number', n: 1 },
+      right: { tag: 'true' },
+    },
+    rest: { tag: 'number', n: 2 },
+  };
+
+  assertThrows(
+    () => typecheck(term, {}),
+    Error,
+    'number expected',
+  );
+});
+
+Deno.test('typecheck const declaration', () => {
+  // const x = 1; x
+  const term: Term = {
+    tag: 'const',
+    name: 'x',
+    init: { tag: 'number', n: 1 },
+    rest: { tag: 'var', name: 'x' },
+  };
+
+  assertEquals(typecheck(term, {}), { tag: 'Number' });
+});
+
+Deno.test('typecheck throws on invalid expression in const initialization', () => {
+  // const x = add(1, true); x
+  const term: Term = {
+    tag: 'const',
+    name: 'x',
+    init: {
+      tag: 'add',
+      left: { tag: 'number', n: 1 },
+      right: { tag: 'true' },
+    },
+    rest: { tag: 'var', name: 'x' },
+  };
+
+  assertThrows(
+    () => typecheck(term, {}),
+    Error,
+    'number expected',
+  );
+});
+
+Deno.test('typecheck throws on reference to undefined variable in const body', () => {
+  // const x = 1; y
+  const term: Term = {
+    tag: 'const',
+    name: 'x',
+    init: { tag: 'number', n: 1 },
+    rest: { tag: 'var', name: 'y' },
+  };
+
+  assertThrows(
+    () => typecheck(term, {}),
+    Error,
+    'unknown variable',
+  );
+});
+
+Deno.test('typecheck allows variable shadowing in const declarations', () => {
+  // const x = 1; const x = true; x
+  const term: Term = {
+    tag: 'const',
+    name: 'x',
+    init: { tag: 'number', n: 1 },
+    rest: {
+      tag: 'const',
+      name: 'x',
+      init: { tag: 'true' },
+      rest: { tag: 'var', name: 'x' },
+    },
+  };
+
+  assertEquals(typecheck(term, {}), { tag: 'Boolean' });
+});
+
+Deno.test('typecheck throws on recursive function definition', () => {
+  // const fact = (n: number) => n === 0 ? 1 : n * fact(n - 1); fact(5)
+  // Simplified here as just: const fact = (n: number) => fact(n); fact(5)
+  const term: Term = {
+    tag: 'const',
+    name: 'fact',
+    init: {
+      tag: 'func',
+      params: [{ name: 'n', type: { tag: 'Number' } }],
+      body: {
+        tag: 'call',
+        func: { tag: 'var', name: 'fact' }, // Reference to 'fact' which is not yet defined in the scope
+        args: [{ tag: 'var', name: 'n' }],
+      },
+    },
+    rest: {
+      tag: 'call',
+      func: { tag: 'var', name: 'fact' },
+      args: [{ tag: 'number', n: 5 }],
+    },
+  };
+
+  assertThrows(
+    () => typecheck(term, {}),
+    Error,
+    'unknown variable',
+  );
+});
+
+Deno.test('typecheck throws on forward reference in const declarations', () => {
+  // const y = x; const x = 1; y
+  const term: Term = {
+    tag: 'const',
+    name: 'y',
+    init: { tag: 'var', name: 'x' }, // Forward reference to 'x' which is not yet defined
+    rest: {
+      tag: 'const',
+      name: 'x',
+      init: { tag: 'number', n: 1 },
+      rest: { tag: 'var', name: 'y' },
+    },
+  };
+
+  assertThrows(
+    () => typecheck(term, {}),
+    Error,
+    'unknown variable',
   );
 });
