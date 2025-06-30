@@ -1,4 +1,4 @@
-import { error, parseBasic } from 'tiny-ts-parser';
+import { error, parseBasic } from './tiny-ts-parser.ts';
 
 export type Type =
   | { tag: 'Boolean' }

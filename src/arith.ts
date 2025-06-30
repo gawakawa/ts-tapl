@@ -1,4 +1,4 @@
-import { parseArith } from 'tiny-ts-parser';
+import { parseArith } from './tiny-ts-parser.ts';
 
 export type Type =
   | { tag: 'Boolean' }

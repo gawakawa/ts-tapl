@@ -7,7 +7,7 @@
     "singleQuote": true
   },
   "imports": {
-    "tiny-ts-parser": "npm:tiny-ts-parser@^0.1.5"
+    "@typescript-eslint/typescript-estree": "npm:@typescript-eslint/typescript-estree"
   },
   "tasks": {
     "test": "deno test --allow-env --allow-sys=cpus --allow-net"
