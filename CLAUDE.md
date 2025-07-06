@@ -14,6 +14,7 @@ The project implements progressively complex type checkers:
   constant binding
 - `obj.ts`: Object creation and property access
 - `recfunc.ts`: Recursive functions
+- `sub.ts`: Subtyping for functions and objects
 
 Each module has a corresponding AST type system with `Term` and `Type`
 definitions, plus a `typecheck` function that performs static type checking.
@@ -22,15 +23,21 @@ definitions, plus a `typecheck` function that performs static type checking.
 
 ### Testing
 
-- Run all tests: `deno run test`
+- Run all tests: `deno task test`
+- Alternative: `deno test --allow-env --allow-sys=cpus --allow-net` Do not run
+  `deno test` without flags.
 
 ### Code Formatting
 
 - Format code: `deno fmt` (uses settings from deno.jsonc)
 
+### Linting
+
+- Lint: `deno lint`
+
 ### Running Individual Modules
 
-- Execute any module directly: `deno run src/arith.ts`
+- Execute any module directly: `deno run -A src/arith.ts`
 
 ## Architecture
 
@@ -53,6 +60,8 @@ The type systems build upon each other:
 - `basic.ts`: Adds function types with parameter lists and return types
 - `obj.ts`: Adds object types with property type checking
 - `recfunc.ts`: Adds recursive function definitions
+- `sub.ts`: Adds subtyping with contravariant parameters and covariant return
+  types
 
 ### Key Patterns
 
@@ -61,6 +70,8 @@ The type systems build upon each other:
   types
 - Type equality checking (`typeEq`) handles structural comparison of complex
   types
+- Subtyping (`subtype`) implements contravariant function parameters and
+  covariant return types
 - Each module includes example usage with `console.log` statements
 
 ## Testing Strategy
