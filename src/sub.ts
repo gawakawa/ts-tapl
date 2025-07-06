@@ -1,4 +1,4 @@
-import { error, parseRecFunc, parseSub } from './tiny-ts-parser.ts';
+import { error, parseSub } from './tiny-ts-parser.ts';
 
 export type Type =
   | { tag: 'Boolean' }
@@ -161,20 +161,21 @@ export const typecheck = (t: Term, tyEnv: TypeEnv): Type => {
     case 'false':
       return { tag: 'Boolean' };
 
-    // case 'if': {
-    //   const condTy = typecheck(t.cond, tyEnv);
-    //   if (condTy.tag !== 'Boolean') {
-    //     error('boolean expected', t.cond);
-    //   }
-    //
-    //   const thnTy = typecheck(t.thn, tyEnv);
-    //   const elsTy = typecheck(t.els, tyEnv);
-    //   if (!typeEq(thnTy, elsTy)) {
-    //     error('then and else have different types', t);
-    //   }
-    //
-    //   return thnTy;
-    // }
+    // TODO: implement join and meet of types to consistent with subtype implementaion
+    case 'if': {
+      const condTy = typecheck(t.cond, tyEnv);
+      if (condTy.tag !== 'Boolean') {
+        error('boolean expected', t.cond);
+      }
+
+      const thnTy = typecheck(t.thn, tyEnv);
+      const elsTy = typecheck(t.els, tyEnv);
+      if (!typeEq(thnTy, elsTy)) {
+        error('then and else have different types', t);
+      }
+
+      return thnTy;
+    }
 
     case 'number':
       return { tag: 'Number' };
@@ -297,22 +298,10 @@ export const typecheck = (t: Term, tyEnv: TypeEnv): Type => {
 };
 
 console.log(typecheck(
-  parseRecFunc(`
+  parseSub(`
   const f = (x: { foo: number }) => x.foo;
   const x = { foo: 1, bar: true };
   f(x);
-`),
-  {},
-));
-
-console.log(typecheck(
-  parseSub(`
-  type F = () => { foo: number; bar: boolean };
-
-  const f = (x: F) => x().bar;
-  const g = () => ({ foo: 1 });
-
-  f(g);
 `),
   {},
 ));
