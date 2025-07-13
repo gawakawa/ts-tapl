@@ -15,6 +15,8 @@ The project implements progressively complex type checkers:
 - `obj.ts`: Object creation and property access
 - `recfunc.ts`: Recursive functions
 - `sub.ts`: Subtyping for functions and objects
+- `poly.ts`: Polymorphic types with type abstraction and type application
+- `rec.ts`: Recursive types (μ-types) with type unfolding
 
 Each module has a corresponding AST type system with `Term` and `Type`
 definitions, plus a `typecheck` function that performs static type checking.
@@ -62,6 +64,10 @@ The type systems build upon each other:
 - `recfunc.ts`: Adds recursive function definitions
 - `sub.ts`: Adds subtyping with contravariant parameters and covariant return
   types
+- `poly.ts`: Adds polymorphic types with type variables, abstraction (`<T>`) and
+  application
+- `rec.ts`: Adds recursive types (`μX.T`) with proper unfolding and equality
+  checking
 
 ### Key Patterns
 
